@@ -1,0 +1,596 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    direction: rtl;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #667eea;
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.week-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    color: #555;
+    font-size: 1.1em;
+    margin-top: 15px;
+}
+
+#schedule-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.week-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    border: 2px solid #e9ecef;
+}
+
+.week-title {
+    font-size: 1.8em;
+    color: #667eea;
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.schedule-table th {
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.schedule-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Day status colors (very soft backgrounds) */
+td.day-past-incomplete {
+    background-color: #FFEBEE; /* very light red */
+}
+
+td.day-today {
+    background-color: #FFF9C4; /* very light yellow for today not completed */
+}
+
+td.day-future {
+    background-color: #E3F2FD; /* very light blue */
+}
+
+td.day-complete {
+    background-color: #E8F5E9; /* very light green for any completed day */
+    border: 1px solid #C5E1A5;
+}
+
+.schedule-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.schedule-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.person-name {
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.person-maryam {
+    background: #ffe0e6;
+    color: #c2185b;
+}
+
+.person-yahya {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.person-ahmed {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.day-number {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+.date-cell {
+    color: #666;
+    font-size: 0.95em;
+}
+
+.section-cell {
+    font-weight: 600;
+    color: #764ba2;
+}
+
+.part-cell {
+    color: #555;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Row that holds badge + button on the same line */
+.part-status-row {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Completion button inside day cell */
+.complete-btn {
+    margin-top: 8px;
+    padding: 4px 12px;
+    font-size: 0.8em;
+    border-radius: 999px;
+    border: 1px solid #b0bec5;
+    background-color: #fafafa;
+    color: #455a64;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.1s;
+}
+
+.complete-btn:hover {
+    background-color: #eceff1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+.complete-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Completed state styling for button */
+.complete-btn.complete-btn-done {
+    background-color: #ffebee; /* light red to indicate cancel */
+    border-color: #e57373;
+    color: #b71c1c;
+}
+
+/* Clear success badge for completed days */
+.day-complete-badge {
+    font-size: 0.85em;
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.day-complete-badge::before {
+    content: '✓';
+    font-weight: 700;
+}
+
+.part-link {
+    cursor: pointer;
+    color: #667eea;
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+.part-link:hover {
+    color: #764ba2;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    direction: rtl;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.modal-close {
+    color: #aaa;
+    float: left;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    left: 20px;
+    top: 15px;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+}
+
+#modal-title {
+    color: #667eea;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#modal-body {
+    line-height: 1.8;
+    color: #333;
+}
+
+.modal-detail-item {
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-right: 4px solid #667eea;
+}
+
+.modal-detail-label {
+    font-weight: 600;
+    color: #764ba2;
+    margin-left: 10px;
+}
+
+.modal-detail-value {
+    color: #555;
+}
+
+/* Navigation link */
+.nav-link {
+    display: inline-block;
+    margin: 20px 0;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Person selection buttons */
+.person-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 30px 0;
+}
+
+.person-btn {
+    padding: 15px 30px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+.person-btn:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.person-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #764ba2;
+}
+
+.person-btn.person-maryam-btn.active {
+    background: #ffe0e6;
+    color: #c2185b;
+    border-color: #c2185b;
+}
+
+.person-btn.person-yahya-btn.active {
+    background: #e3f2fd;
+    color: #1976d2;
+    border-color: #1976d2;
+}
+
+.person-btn.person-ahmed-btn.active {
+    background: #e8f5e9;
+    color: #388e3c;
+    border-color: #388e3c;
+}
+
+/* Single person schedule */
+.single-person-schedule {
+    margin-top: 20px;
+}
+
+.single-person-schedule .schedule-table {
+    font-size: 1em;
+}
+
+.single-person-schedule .schedule-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 18px;
+    font-size: 1.15em;
+}
+
+.single-person-schedule .schedule-table td {
+    padding: 16px;
+    font-size: 1.05em;
+}
+
+/* Person week progress bar */
+.person-progress {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.person-progress-text {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+}
+
+.progress-bar {
+    width: 100%;
+    max-width: 400px;
+    height: 12px;
+    border-radius: 999px;
+    background: #eceff1;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #81c784, #4caf50);
+    transition: width 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+
+    .week-info {
+        font-size: 0.95em;
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .week-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .week-title {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+    }
+
+    .schedule-table {
+        font-size: 0.85em;
+        display: block;
+        width: 100%;
+    }
+
+    .schedule-table thead {
+        display: none;
+    }
+
+    .schedule-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .schedule-table tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .schedule-table tr:nth-child(odd) {
+        background: #f8f9fa;
+    }
+
+    .schedule-table tr:nth-child(even) {
+        background: white;
+    }
+
+    .schedule-table td {
+        display: block;
+        width: 100%;
+        padding: 12px 15px;
+        text-align: right;
+        border-bottom: 1px solid #e9ecef;
+        position: relative;
+        padding-right: 40%;
+    }
+
+    .schedule-table td:last-child {
+        border-bottom: none;
+    }
+
+    .schedule-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 700;
+        color: #667eea;
+        font-size: 0.9em;
+        width: 35%;
+        text-align: right;
+    }
+
+    .schedule-table td .person-name,
+    .schedule-table td .section-cell,
+    .schedule-table td .part-cell {
+        text-align: right;
+        margin-right: 0;
+    }
+
+    .person-buttons {
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .person-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+
+    .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 10px 20px;
+        font-size: 0.95em;
+        margin: 15px 0;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .single-person-schedule .schedule-table {
+        font-size: 0.9em;
+    }
+
+    .single-person-schedule .schedule-table tr {
+        background: #f8f9fa;
+    }
+
+    .single-person-schedule .schedule-table tr:nth-child(odd) {
+        background: #f0f4ff;
+    }
+
+    .single-person-schedule .schedule-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .single-person-schedule .schedule-table td {
+        padding: 14px 15px;
+        padding-right: 40%;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.3em;
+    }
+
+    .week-title {
+        font-size: 1.1em;
+    }
+
+    .schedule-table {
+        font-size: 0.7em;
+    }
+
+    .person-name {
+        font-size: 0.9em;
+        padding: 4px 8px;
+    }
+}
+
