@@ -4,30 +4,13 @@
 # OS files
 .DS_Store
 Thumbs.db
-*.swp
-*.swo
-*~
 
 # Logs
 *.log
 
-# Temporary files
-*.tmp
-*.temp
-
 # PHP session files
 *.sess
 
-# Environment files
-.env
-.env.local
-
-# Config file (each environment has its own - use config.php.template)
-config.php
-
-# Local progress file (development only)
-progress.local.json
-
-# Server data (read-only copy - fetched from production)
-progress.server.json
+# Progress data (will be uploaded to server via SFTP, not via Git)
+progress.json
 

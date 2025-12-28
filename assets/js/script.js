@@ -150,7 +150,7 @@ function setDayCompleted(personName, weekNumber, dayNumber, completed) {
 // Load progress from server (progress.json via get_progress.php)
 async function loadRemoteProgress() {
     try {
-        const response = await fetch('get_progress.php', { cache: 'no-store' });
+        const response = await fetch('api/get_progress.php', { cache: 'no-store' });
         if (!response.ok) {
             throw new Error('HTTP ' + response.status);
         }
@@ -170,7 +170,7 @@ async function loadRemoteProgress() {
 async function saveDayCompletedRemote(personName, weekNumber, dayNumber, completed) {
     const key = getDayKey(personName, weekNumber, dayNumber);
     try {
-        const response = await fetch('save_progress.php', {
+        const response = await fetch('api/save_progress.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

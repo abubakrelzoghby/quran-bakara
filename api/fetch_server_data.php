@@ -7,7 +7,7 @@ header('Content-Type: text/html; charset=utf-8');
 // Configuration - UPDATE THIS with your server URL
 $SERVER_URL = 'https://az-dev.com/family/bakara/get_progress.php';
 
-$outputFile = __DIR__ . '/progress.server.json';
+$outputFile = __DIR__ . '/../progress.json';
 
 echo "<!DOCTYPE html>\n";
 echo "<html lang='ar' dir='rtl'>\n";
@@ -48,8 +48,8 @@ try {
     
     echo "<p style='color: green; font-weight: bold;'>✓ تم جلب البيانات بنجاح!</p>\n";
     echo "<p>عدد السجلات: <strong>$count</strong></p>\n";
-    echo "<p>تم الحفظ في: <code>progress.server.json</code></p>\n";
-    echo "<p style='color: #666;'>ملاحظة: هذا الملف للقراءة فقط - لن يتم تعديل بيانات السيرفر</p>\n";
+    echo "<p>تم الحفظ في: <code>progress.json</code></p>\n";
+    echo "<p style='color: #666;'>ملاحظة: هذه البيانات ستُرفع على السيرفر عند الرفع التالي</p>\n";
     
     // Show preview
     if ($count > 0) {
@@ -70,6 +70,6 @@ try {
 }
 
 echo "<hr>\n";
-echo "<p><a href='index.html' style='color: #667eea;'>← العودة للصفحة الرئيسية</a></p>\n";
+echo "<p><a href='../index.html' style='color: #667eea;'>← العودة للصفحة الرئيسية</a></p>\n";
 echo "</body></html>\n";
 
