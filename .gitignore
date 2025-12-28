@@ -22,6 +22,9 @@ Thumbs.db
 .env
 .env.local
 
+# Config file (each environment has its own - use config.php.template)
+config.php
+
 # Local progress file (development only)
 progress.local.json
 

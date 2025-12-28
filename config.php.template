@@ -1,0 +1,14 @@
+<?php
+// Configuration file to separate local and production data
+// Copy this file to config.php and set the appropriate environment
+// In dev folder: set ENVIRONMENT to 'local'
+// In main folder (on server): set ENVIRONMENT to 'production'
+
+define('ENVIRONMENT', 'local'); // Change to 'production' on server
+
+if (ENVIRONMENT === 'local') {
+    define('PROGRESS_FILE', __DIR__ . '/progress.local.json');
+} else {
+    define('PROGRESS_FILE', __DIR__ . '/progress.json');
+}
+
