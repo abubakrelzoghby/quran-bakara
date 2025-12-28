@@ -31,20 +31,26 @@
 
 ```
 bakara/
-├── index.html          # الصفحة الرئيسية
-├── person.html         # صفحة الشخص الفردية
-├── styles.css          # التنسيقات
-├── script.js           # المنطق الرئيسي + البيانات المدمجة
-├── person.js           # منطق الصفحة الفردية
-├── README.md           # هذا الملف
-└── .cursor/            # ملفات التوثيق للـ AI agents
-    ├── docs/           # توثيق التواصل بين الـ AI agents
-    │   ├── QUICK_START.md
-    │   └── PROMPT_FOR_AI.md
-    └── rules/          # قواعد المشروع
-        ├── project-details.mdc
-        └── basic-rules.mdc
+├── dev/                # مجلد التطوير (Development)
+│   ├── index.html      # الصفحة الرئيسية
+│   ├── person.html     # صفحة الشخص الفردية
+│   ├── styles.css      # التنسيقات
+│   ├── script.js       # المنطق الرئيسي + البيانات المدمجة
+│   ├── person.js       # منطق الصفحة الفردية
+│   ├── *.php           # ملفات PHP للميزات الإضافية
+│   ├── README.md       # هذا الملف
+│   └── .gitignore      # ملفات مستثناة من Git
+│
+└── main/               # مجلد الإنتاج (Production)
+    ├── .vscode/        # إعدادات VS Code (SFTP)
+    └── (يتم استدعاء الملفات من GitHub)
 ```
+
+### ملاحظات حول البنية
+- **dev/**: مجلد التطوير - هنا نعمل التعديلات والتجارب
+- **main/**: مجلد الإنتاج - يتم استدعاء الكود من GitHub ورفعه على السيرفر
+- يتم العمل على branch `develop` في مجلد dev
+- يتم العمل على branch `main` في مجلد main للإنتاج
 
 ## البيانات
 
