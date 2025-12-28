@@ -24,7 +24,7 @@ const DATA = {
         {"day": 4, "verseStart": 75, "verseEnd": 91, "page": 11, "firstVerse": "ربع أفتطمعون"},
         {"day": 5, "verseStart": 92, "verseEnd": 105, "page": 14, "firstVerse": "ربع ولقد جاءكم موسى"},
         {"day": 6, "verseStart": 106, "verseEnd": 123, "page": 17, "firstVerse": "ربع ما ننسخ"},
-        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم التعويض"}
+        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم الاستدراك"}
       ]
     },
     {
@@ -38,7 +38,7 @@ const DATA = {
         {"day": 4, "verseStart": 177, "verseEnd": 188, "page": 27, "firstVerse": "ربع ليس البر أن تولوا وجوهكم"},
         {"day": 5, "verseStart": 189, "verseEnd": 203, "page": 29, "firstVerse": "ربع يسئلونك عن الأهلة"},
         {"day": 6, "verseStart": 204, "verseEnd": 218, "page": 32, "firstVerse": "تاني آية في الربع - ومن الناس من يعجبك"},
-        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم التعويض"}
+        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم الاستدراك"}
       ]
     },
     {
@@ -52,7 +52,7 @@ const DATA = {
         {"day": 4, "verseStart": 254, "verseEnd": 263, "page": 42, "firstVerse": "تاني آية في الربع - يأيها الذين آمنوا أنفقوا مما رزقناكم"},
         {"day": 5, "verseStart": 264, "verseEnd": 273, "page": 44, "firstVerse": "تاني آية في الربع - يأيها الذين آمنوا لا تبطلوا صدقاتكم"},
         {"day": 6, "verseStart": 274, "verseEnd": 286, "page": 46, "firstVerse": "الذين ينفقون أموالهم"},
-        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم التعويض"}
+        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم الاستدراك"}
       ]
     }
   ]
@@ -221,6 +221,21 @@ function setPersonVerified(personName) {
 
 // Determine CSS class for a given day based on date and completion status
 function getDayCssClass(personName, dateForDay, weekNumber, dayNumber) {
+    // Special handling for compensation day (day 7)
+    if (dayNumber === 7) {
+        // Check if all reading days (1-6) are completed
+        let allDaysCompleted = true;
+        for (let day = 1; day <= 6; day++) {
+            if (!isDayCompleted(personName, weekNumber, day)) {
+                allDaysCompleted = false;
+                break;
+            }
+        }
+        
+        // If all days completed → green, otherwise → yellow (warning)
+        return allDaysCompleted ? 'day-complete' : 'day-compensation-warning';
+    }
+
     const today = new Date();
     // Normalize times to compare dates only
     const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -381,7 +396,7 @@ function generateSchedule() {
 // Format part display (simple version)
 function formatPartDisplay(part) {
     if (!part || part.day === 7) {
-        return 'يوم التعويض';
+        return 'يوم الاستدراك';
     }
     return `ص ${part.page} من آية ${part.verseStart} إلى ${part.verseEnd}`;
 }
@@ -396,7 +411,7 @@ function showPartDetails(person, section, part) {
     
     let html = '';
     if (part && part.day === 7) {
-        html = '<div class="modal-detail-item"><span class="modal-detail-label">اليوم:</span> <span class="modal-detail-value">يوم التعويض</span></div>';
+        html = '<div class="modal-detail-item"><span class="modal-detail-label">اليوم:</span> <span class="modal-detail-value">يوم الاستدراك</span></div>';
     } else if (part) {
         html = `
             <div class="modal-detail-item">
@@ -512,7 +527,7 @@ function createWeekTable(weekData) {
                     );
                     partDiv.appendChild(partLink);
                 } else {
-                    partDiv.textContent = 'يوم التعويض';
+                    partDiv.textContent = 'يوم الاستدراك';
                 }
                 
                 personCell.appendChild(personSpan);

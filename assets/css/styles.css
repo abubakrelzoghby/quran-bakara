@@ -110,6 +110,11 @@ td.day-complete {
     border: 1px solid #C5E1A5;
 }
 
+td.day-compensation-warning {
+    background-color: #FFF9C4; /* very light yellow for compensation day when some days are incomplete */
+    border: 1px solid #FDD835;
+}
+
 .schedule-table tbody tr:hover {
     background: #f8f9fa;
 }

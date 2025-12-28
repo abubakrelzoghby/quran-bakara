@@ -130,35 +130,38 @@ function createPersonSchedule(personName) {
             partLink.onclick = () => showPartDetails(personName, section, part);
             partCell.appendChild(partLink);
         } else {
-            partCell.textContent = 'يوم التعويض';
+            partCell.textContent = 'يوم الاستدراك';
         }
 
-        const isCompleted = isDayCompleted(personName, currentWeek, day);
+        // Day 7 (compensation day) should not have completion button
+        if (day !== 7) {
+            const isCompleted = isDayCompleted(personName, currentWeek, day);
 
-        // Container row for badge + button on the same line
-        const statusRow = document.createElement('div');
-        statusRow.className = 'part-status-row';
+            // Container row for badge + button on the same line
+            const statusRow = document.createElement('div');
+            statusRow.className = 'part-status-row';
 
-        // Clear success badge inside the row when completed
-        if (isCompleted) {
-            const badge = document.createElement('span');
-            badge.className = 'day-complete-badge';
-            badge.textContent = 'مكتمل';
-            statusRow.appendChild(badge);
+            // Clear success badge inside the row when completed
+            if (isCompleted) {
+                const badge = document.createElement('span');
+                badge.className = 'day-complete-badge';
+                badge.textContent = 'مكتمل';
+                statusRow.appendChild(badge);
+            }
+
+            // Completion toggle button (only for current week of this person)
+            const completeBtn = document.createElement('button');
+            completeBtn.type = 'button';
+            completeBtn.className = isCompleted ? 'complete-btn complete-btn-done' : 'complete-btn';
+            // \"تم\" لحفظ اليوم، و\"إلغاء\" لإرجاعه بدون لون أخضر في الزر نفسه
+            completeBtn.textContent = isCompleted ? 'إلغاء' : 'تم';
+            completeBtn.dataset.week = String(currentWeek);
+            completeBtn.dataset.day = String(day);
+            completeBtn.dataset.person = personName;
+            statusRow.appendChild(completeBtn);
+
+            partCell.appendChild(statusRow);
         }
-
-        // Completion toggle button (only for current week of this person)
-        const completeBtn = document.createElement('button');
-        completeBtn.type = 'button';
-        completeBtn.className = isCompleted ? 'complete-btn complete-btn-done' : 'complete-btn';
-        // \"تم\" لحفظ اليوم، و\"إلغاء\" لإرجاعه بدون لون أخضر في الزر نفسه
-        completeBtn.textContent = isCompleted ? 'إلغاء' : 'تم';
-        completeBtn.dataset.week = String(currentWeek);
-        completeBtn.dataset.day = String(day);
-        completeBtn.dataset.person = personName;
-        statusRow.appendChild(completeBtn);
-
-        partCell.appendChild(statusRow);
 
         row.appendChild(partCell);
         
@@ -244,6 +247,12 @@ async function initPersonPage() {
 
         const weekNumber = parseInt(weekStr, 10);
         const dayNumber = parseInt(dayStr, 10);
+        
+        // Prevent completion toggle for day 7 (compensation day)
+        if (dayNumber === 7) {
+            return;
+        }
+        
         if (!ensurePersonVerified(personName)) {
             return;
         }
