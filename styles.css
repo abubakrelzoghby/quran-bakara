@@ -398,12 +398,14 @@ td.day-complete {
 }
 
 /* Person week progress bar */
-.person-progress {
+.person-progress,
+.week-progress {
     margin-top: 15px;
     text-align: center;
 }
 
-.person-progress-text {
+.person-progress-text,
+.week-progress-text {
     font-weight: 600;
     color: #444;
     margin-bottom: 6px;
@@ -425,6 +427,54 @@ td.day-complete {
     width: 0;
     background: linear-gradient(90deg, #81c784, #4caf50);
     transition: width 0.3s ease;
+}
+
+/* Week progress segmented bar for 3 people */
+.week-progress-bar {
+    width: 100%;
+    max-width: 420px;
+    height: 12px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1px; /* very small gap so it looks like one bar */
+}
+
+.week-progress-segment {
+    flex: 1;
+    background: #eceff1;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+    position: relative;
+}
+
+.week-progress-segment-fill {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.week-progress-segment-fill.maryam {
+    background: linear-gradient(90deg, #ffb3c6, #ff80ab);
+}
+
+.week-progress-segment-fill.yahya {
+    background: linear-gradient(90deg, #90caf9, #42a5f5);
+}
+
+.week-progress-segment-fill.ahmed {
+    background: linear-gradient(90deg, #a5d6a7, #66bb6a);
+}
+
+/* Rounded ends only for the outer segments */
+.week-progress-segment:first-child {
+    border-top-right-radius: 999px;
+    border-bottom-right-radius: 999px;
+}
+
+.week-progress-segment:last-child {
+    border-top-left-radius: 999px;
+    border-bottom-left-radius: 999px;
 }
 
 @media (max-width: 768px) {

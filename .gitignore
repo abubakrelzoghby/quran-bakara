@@ -22,3 +22,9 @@ Thumbs.db
 .env
 .env.local
 
+# Local progress file (development only)
+progress.local.json
+
+# Server data (read-only copy - fetched from production)
+progress.server.json
+

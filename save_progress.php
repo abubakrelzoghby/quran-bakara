@@ -1,9 +1,12 @@
 <?php
-// Save single day progress into progress.json
+// Save single day progress into progress.local.json ONLY
+// This will NEVER modify progress.server.json (server data is read-only)
 
 header('Content-Type: application/json; charset=utf-8');
 
-$file = __DIR__ . '/progress.json';
+require_once __DIR__ . '/config.php';
+// Always save to local file (never touch server data)
+$file = PROGRESS_FILE; // This is progress.local.json in dev environment
 
 // Read JSON body
 $raw = file_get_contents('php://input');

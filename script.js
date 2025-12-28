@@ -64,11 +64,12 @@ const READING_STATUS_KEY = 'baqaraReadingStatus';
 // In-memory cache for server-side progress (from progress.json)
 let REMOTE_PROGRESS = null;
 
-// Simple numeric passwords for each person (per device verification)
+// Simple 6-digit numeric passwords for each person (per device verification)
+// NOTE: change here only if you want to regenerate passwords
 const PERSON_PASSWORDS = {
-    'مريم': '1234',
-    'يحيى': '2345',
-    'أحمد': '3456'
+    'مريم': '482913',
+    'يحيى': '750246',
+    'أحمد': '319578'
 };
 
 // Load reading status from localStorage
@@ -543,6 +544,71 @@ function updateCurrentWeekInfo() {
     infoElement.textContent = `الأسبوع الحالي: الأسبوع ${currentWeek} (${startDate} - ${endDate})`;
 }
 
+// Update overall progress bar for current week (all people together)
+function updateOverallWeekProgress() {
+    const container = document.getElementById('overall-week-progress');
+    if (!container) return;
+
+    const config = getConfig();
+    if (!config) return;
+
+    const currentWeek = getCurrentWeekNumber();
+    const totalDaysPerPerson = config.readingDays || 6; // exclude compensation day
+
+    container.innerHTML = '';
+
+    // Text for segmented per-person progress
+    const textPerPerson = document.createElement('div');
+    textPerPerson.className = 'week-progress-text';
+    textPerPerson.textContent = 'تقدم الأسبوع الحالي لكل واحد منهم:';
+
+    const bar = document.createElement('div');
+    bar.className = 'week-progress-bar';
+
+    let totalSlots = 0;
+    let totalCompletedSlots = 0;
+
+    config.people.forEach(personName => {
+        let completedDays = 0;
+        for (let day = 1; day <= totalDaysPerPerson; day++) {
+            if (isDayCompleted(personName, currentWeek, day)) {
+                completedDays++;
+            }
+        }
+        const percentPerson = totalDaysPerPerson > 0
+            ? Math.round((completedDays / totalDaysPerPerson) * 100)
+            : 0;
+
+        totalSlots += totalDaysPerPerson;
+        totalCompletedSlots += completedDays;
+
+        const segment = document.createElement('div');
+        segment.className = 'week-progress-segment';
+
+        const fill = document.createElement('div');
+        const personClass = getPersonClassName(personName); // maryam / yahya / ahmed
+        fill.className = `week-progress-segment-fill ${personClass}`;
+        fill.style.width = `${percentPerson}%`;
+
+        segment.appendChild(fill);
+        bar.appendChild(segment);
+    });
+
+    container.appendChild(textPerPerson);
+    container.appendChild(bar);
+
+    // Overall percentage for the whole week (all three together)
+    const overallPercent = totalSlots > 0
+        ? Math.round((totalCompletedSlots / totalSlots) * 100)
+        : 0;
+
+    const textOverall = document.createElement('div');
+    textOverall.className = 'week-progress-text';
+    textOverall.textContent = `تم قراءة نسبة ${overallPercent}٪ من سورة البقرة هذا الأسبوع.`;
+
+    container.appendChild(textOverall);
+}
+
 // Initialize the page
 async function init() {
     const container = document.getElementById('schedule-container');
@@ -565,6 +631,7 @@ async function init() {
     });
     
     updateCurrentWeekInfo();
+    updateOverallWeekProgress();
     
     // Setup modal close handlers
     const modal = document.getElementById('part-modal');
