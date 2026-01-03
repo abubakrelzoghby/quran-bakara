@@ -1,62 +1,6 @@
-// Global data storage - using embedded data directly
-const DATA = {
-  "config": {
-    "startDate": "2025-12-12",
-    "people": ["مريم", "يحيى", "أحمد"],
-    "daysPerWeek": 7,
-    "readingDays": 6,
-    "compensationDay": 7
-  },
-  "rotationPattern": [
-    [0, 1, 2],
-    [1, 2, 0],
-    [2, 0, 1]
-  ],
-  "sections": [
-    {
-      "id": 1,
-      "name": "قسم 1",
-      "verseRange": "1-123",
-      "parts": [
-        {"day": 1, "verseStart": 1, "verseEnd": 29, "page": 1, "firstVerse": "ألم"},
-        {"day": 2, "verseStart": 30, "verseEnd": 57, "page": 6, "firstVerse": "وإذ قال ربك للملائكة"},
-        {"day": 3, "verseStart": 58, "verseEnd": 74, "page": 9, "firstVerse": "وإذ قلنا ادخلوا هذه القرية"},
-        {"day": 4, "verseStart": 75, "verseEnd": 91, "page": 11, "firstVerse": "ربع أفتطمعون"},
-        {"day": 5, "verseStart": 92, "verseEnd": 105, "page": 14, "firstVerse": "ربع ولقد جاءكم موسى"},
-        {"day": 6, "verseStart": 106, "verseEnd": 123, "page": 17, "firstVerse": "ربع ما ننسخ"},
-        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم الاستدراك"}
-      ]
-    },
-    {
-      "id": 2,
-      "name": "قسم 2",
-      "verseRange": "124-218",
-      "parts": [
-        {"day": 1, "verseStart": 124, "verseEnd": 141, "page": 19, "firstVerse": "ربع وإذ ابتلى إبراهيم ربه"},
-        {"day": 2, "verseStart": 142, "verseEnd": 157, "page": 22, "firstVerse": "ربع سيقول السفهاء"},
-        {"day": 3, "verseStart": 158, "verseEnd": 176, "page": 24, "firstVerse": "ربع ان الصفا والمروة"},
-        {"day": 4, "verseStart": 177, "verseEnd": 188, "page": 27, "firstVerse": "ربع ليس البر أن تولوا وجوهكم"},
-        {"day": 5, "verseStart": 189, "verseEnd": 203, "page": 29, "firstVerse": "ربع يسئلونك عن الأهلة"},
-        {"day": 6, "verseStart": 204, "verseEnd": 218, "page": 32, "firstVerse": "تاني آية في الربع - ومن الناس من يعجبك"},
-        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم الاستدراك"}
-      ]
-    },
-    {
-      "id": 3,
-      "name": "قسم 3",
-      "verseRange": "219-286",
-      "parts": [
-        {"day": 1, "verseStart": 219, "verseEnd": 232, "page": 34, "firstVerse": "ربع يسئلونك عن الخمر والميسر"},
-        {"day": 2, "verseStart": 233, "verseEnd": 242, "page": 37, "firstVerse": "ربع والوالدات"},
-        {"day": 3, "verseStart": 243, "verseEnd": 253, "page": 39, "firstVerse": "ربع ألم تر إلى الذين خرجوا"},
-        {"day": 4, "verseStart": 254, "verseEnd": 263, "page": 42, "firstVerse": "تاني آية في الربع - يأيها الذين آمنوا أنفقوا مما رزقناكم"},
-        {"day": 5, "verseStart": 264, "verseEnd": 273, "page": 44, "firstVerse": "تاني آية في الربع - يأيها الذين آمنوا لا تبطلوا صدقاتكم"},
-        {"day": 6, "verseStart": 274, "verseEnd": 286, "page": 46, "firstVerse": "الذين ينفقون أموالهم"},
-        {"day": 7, "verseStart": null, "verseEnd": null, "page": null, "firstVerse": "يوم الاستدراك"}
-      ]
-    }
-  ]
-};
+// Global data storage - loaded from API
+let DATA = null;
+let CURRENT_WEEK = 1;
 
 // LocalStorage keys and reading status structure
 const READING_STATUS_KEY = 'baqaraReadingStatus';
@@ -263,9 +207,41 @@ function getDayCssClass(personName, dateForDay, weekNumber, dayNumber) {
     return 'day-future';
 }
 
-// Data is embedded directly - no need to load from file
-function loadData() {
-    return Promise.resolve(DATA);
+// Load data from API
+async function loadData() {
+    if (DATA !== null) {
+        return Promise.resolve(DATA);
+    }
+    
+    try {
+        const response = await fetch('api/get_data.php', { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+        const apiData = await response.json();
+        
+        // Store data in global variable
+        DATA = {
+            config: apiData.config,
+            sections: apiData.sections,
+            rotationPattern: apiData.rotationPattern
+        };
+        
+        // Store current week
+        if (apiData.currentWeek) {
+            CURRENT_WEEK = apiData.currentWeek;
+        }
+        
+        return DATA;
+    } catch (e) {
+        console.error('Failed to load data from API', e);
+        // Fallback: return empty data structure
+        return {
+            config: { startDate: "2025-12-12", people: ["مريم", "يحيى", "أحمد"], daysPerWeek: 7, readingDays: 6, compensationDay: 7 },
+            sections: [],
+            rotationPattern: [[0, 1, 2], [1, 2, 0], [2, 0, 1]]
+        };
+    }
 }
 
 // Configuration from loaded data
@@ -333,8 +309,13 @@ function getWeekDates(weekNumber) {
     return dates;
 }
 
-// Get current week number based on today's date
+// Get current week number (from API or calculated)
 function getCurrentWeekNumber() {
+    if (CURRENT_WEEK > 0) {
+        return CURRENT_WEEK;
+    }
+    
+    // Fallback calculation if API data not loaded yet
     const config = getConfig();
     if (!config) return 1;
     
@@ -345,50 +326,54 @@ function getCurrentWeekNumber() {
     const weekNumber = Math.floor(diffDays / 7) + 1;
     
     if (weekNumber < 1) return 1;
-    if (weekNumber > 3) return 3;
     return weekNumber;
 }
 
-// Generate schedule data for all weeks
+// Generate schedule data for current week only
 function generateSchedule() {
     const config = getConfig();
-    const schedule = [];
+    if (!config || !DATA) return [];
     
-    for (let week = 1; week <= 3; week++) {
-        const weekData = {
-            weekNumber: week,
-            dates: getWeekDates(week),
-            days: []
+    const schedule = [];
+    const currentWeek = getCurrentWeekNumber();
+    
+    // Only generate current week
+    const week = currentWeek;
+    const weekData = {
+        weekNumber: week,
+        dates: getWeekDates(week),
+        days: []
+    };
+    
+    // Rotation pattern repeats every 3 weeks
+    const rotationIndex = (week - 1) % 3;
+    const rotation = DATA.rotationPattern[rotationIndex];
+    
+    for (let day = 1; day <= config.daysPerWeek; day++) {
+        const dayData = {
+            dayNumber: day,
+            date: weekData.dates[day - 1],
+            assignments: []
         };
         
-        const rotation = DATA.rotationPattern[week - 1];
-        
-        for (let day = 1; day <= config.daysPerWeek; day++) {
-            const dayData = {
-                dayNumber: day,
-                date: weekData.dates[day - 1],
-                assignments: []
-            };
+        // Assign each person their section for this week
+        config.people.forEach((person, personIndex) => {
+            const sectionIndex = rotation[personIndex];
+            const section = DATA.sections[sectionIndex];
+            const part = getPart(section.id, day);
             
-            // Assign each person their section for this week
-            config.people.forEach((person, personIndex) => {
-                const sectionIndex = rotation[personIndex];
-                const section = DATA.sections[sectionIndex];
-                const part = getPart(section.id, day);
-                
-                dayData.assignments.push({
-                    person: person,
-                    personIndex: personIndex,
-                    section: section,
-                    part: part
-                });
+            dayData.assignments.push({
+                person: person,
+                personIndex: personIndex,
+                section: section,
+                part: part
             });
-            
-            weekData.days.push(dayData);
-        }
+        });
         
-        schedule.push(weekData);
+        weekData.days.push(dayData);
     }
+    
+    schedule.push(weekData);
     
     return schedule;
 }
@@ -633,7 +618,10 @@ async function init() {
         return;
     }
 
-    // Try to load remote progress first (if PHP backend is available)
+    // Load data from API first
+    await loadData();
+    
+    // Try to load remote progress (if PHP backend is available)
     await loadRemoteProgress();
     
     const schedule = generateSchedule();
