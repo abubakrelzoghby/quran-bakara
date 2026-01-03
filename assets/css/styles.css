@@ -321,23 +321,82 @@ td.day-compensation-warning {
     text-decoration: none;
     border-radius: 25px;
     font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: opacity 0.2s; /* Reduced animation */
     text-align: center;
 }
 
-/* Week navigation buttons - temporarily hidden */
-.week-navigation,
-.week-navigation-container,
-.week-navigation-container-person,
-.week-nav-btn,
-.week-nav-prev,
+/* Week navigation buttons - separate row above nav-link */
+.week-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    gap: 15px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+/* Header actions row - contains only nav-link */
+.header-actions-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+/* Nav link - centered */
+.header-actions-row .nav-link {
+    margin: 0;
+}
+
+/* Week navigation buttons */
+.week-nav-btn {
+    padding: 10px 20px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 20px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.week-nav-btn:hover:not(:disabled) {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.week-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.week-nav-prev {
+    /* Previous button - on left in RTL */
+    order: 2; /* In RTL, higher order = left side */
+}
+
 .week-nav-next {
-    display: none !important;
+    /* Next button - on right in RTL */
+    order: 1; /* In RTL, lower order = right side */
+}
+
+/* Hidden button - invisible but takes space for space-between */
+.week-nav-btn.hidden {
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .nav-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    /* Reduced animation - just slight color change */
+    opacity: 0.9;
 }
 
 /* Person selection buttons */
