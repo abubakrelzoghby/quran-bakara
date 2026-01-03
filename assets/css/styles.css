@@ -325,6 +325,16 @@ td.day-compensation-warning {
     text-align: center;
 }
 
+/* Week navigation buttons - temporarily hidden */
+.week-navigation,
+.week-navigation-container,
+.week-navigation-container-person,
+.week-nav-btn,
+.week-nav-prev,
+.week-nav-next {
+    display: none !important;
+}
+
 .nav-link:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
