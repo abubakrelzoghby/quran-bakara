@@ -5,7 +5,7 @@
 header('Content-Type: text/html; charset=utf-8');
 
 // Configuration - UPDATE THIS with your server URL
-$SERVER_URL = 'https://az-dev.com/family/bakara/get_progress.php';
+$SERVER_URL = 'https://az-dev.com/family/bakara/api/get_progress.php';
 
 $outputFile = __DIR__ . '/../progress.json';
 
@@ -32,12 +32,27 @@ try {
     }
     
     if ($httpCode !== 200) {
+        echo "<p style='color: orange;'>تحذير: كود HTTP: $httpCode</p>\n";
+        echo "<h3>الرد من السيرفر:</h3>\n";
+        echo "<pre style='background: #fff3cd; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 300px;'>";
+        echo htmlspecialchars(substr($response, 0, 2000));
+        echo "</pre>\n";
         throw new Exception("خطأ HTTP: " . $httpCode);
+    }
+    
+    // Show raw response for debugging
+    if (empty($response)) {
+        throw new Exception("الرد من السيرفر فارغ");
     }
     
     // Validate JSON
     $data = json_decode($response, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
+        echo "<h3>الرد الخام من السيرفر (أول 2000 حرف):</h3>\n";
+        echo "<pre style='background: #fff3cd; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 300px;'>";
+        echo htmlspecialchars(substr($response, 0, 2000));
+        echo "</pre>\n";
+        echo "<p style='color: orange;'>خطأ JSON: " . json_last_error_msg() . " (كود الخطأ: " . json_last_error() . ")</p>\n";
         throw new Exception("خطأ في تحليل JSON: " . json_last_error_msg());
     }
     

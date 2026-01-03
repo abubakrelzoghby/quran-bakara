@@ -39,9 +39,14 @@ function updatePersonButtons(selectedPersonName) {
 // Create single person schedule for current week
 function createPersonSchedule(personName) {
     const config = getConfig();
+    if (!config || !DATA) return null;
+    
     const currentWeek = getCurrentWeekNumber();
     const weekDates = getWeekDates(currentWeek);
-    const rotation = DATA.rotationPattern[currentWeek - 1];
+    
+    // Rotation pattern repeats every 3 weeks
+    const rotationIndex = (currentWeek - 1) % 3;
+    const rotation = DATA.rotationPattern[rotationIndex];
     
     // Find person index
     const personIndex = config.people.indexOf(personName);
@@ -191,6 +196,11 @@ function updateCurrentWeekInfoPerson() {
 
 // Initialize person page
 async function initPersonPage() {
+    // Load data from API first
+    if (typeof loadData === 'function') {
+        await loadData();
+    }
+    
     // Load saved person or default to first person
     const savedPerson = loadSavedPerson();
     selectedPerson = savedPerson || getConfig().people[0];
