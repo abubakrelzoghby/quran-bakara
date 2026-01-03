@@ -1,6 +1,7 @@
 // Person page specific functionality
 
 let selectedPerson = null;
+let DISPLAYED_WEEK_PERSON = null; // Currently displayed week on person page
 
 // Load saved person preference
 function loadSavedPerson() {
@@ -36,16 +37,37 @@ function updatePersonButtons(selectedPersonName) {
     });
 }
 
-// Create single person schedule for current week
-function createPersonSchedule(personName) {
+// Get displayed week for person page (always default to current week on page load/refresh)
+function getDisplayedWeekPerson() {
+    if (DISPLAYED_WEEK_PERSON !== null) {
+        return DISPLAYED_WEEK_PERSON;
+    }
+    
+    // Always default to current week on page load/refresh
+    // Don't use localStorage - always show current week when page loads
+    const currentWeek = getCurrentWeekNumber();
+    DISPLAYED_WEEK_PERSON = currentWeek;
+    return currentWeek;
+}
+
+// Save displayed week for person page (in memory only, not localStorage)
+// This way, refresh always shows current week
+function saveDisplayedWeekPerson(weekNumber) {
+    DISPLAYED_WEEK_PERSON = weekNumber;
+    // Don't save to localStorage - we want to always show current week on refresh
+}
+
+// Create single person schedule for a specific week
+function createPersonSchedule(personName, weekNumberOverride = null) {
     const config = getConfig();
     if (!config || !DATA) return null;
     
-    const currentWeek = getCurrentWeekNumber();
-    const weekDates = getWeekDates(currentWeek);
+    // Use provided week number or displayed week
+    const weekNumber = weekNumberOverride || getDisplayedWeekPerson();
+    const weekDates = getWeekDates(weekNumber);
     
     // Rotation pattern repeats every 3 weeks
-    const rotationIndex = (currentWeek - 1) % 3;
+    const rotationIndex = (weekNumber - 1) % 3;
     const rotation = DATA.rotationPattern[rotationIndex];
     
     // Find person index
@@ -64,7 +86,12 @@ function createPersonSchedule(personName) {
     weekTitle.className = 'week-title';
     const startDate = formatDate(weekDates[0]);
     const endDate = formatDate(weekDates[6]);
-    weekTitle.textContent = `الأسبوع ${currentWeek} - ${personName} (${startDate} - ${endDate})`;
+    const currentWeek = getCurrentWeekNumber();
+    if (weekNumber === currentWeek) {
+        weekTitle.textContent = `الأسبوع الحالي: الأسبوع ${weekNumber} - ${personName} (${startDate} - ${endDate})`;
+    } else {
+        weekTitle.textContent = `الأسبوع ${weekNumber} - ${personName} (${startDate} - ${endDate})`;
+    }
     container.appendChild(weekTitle);
     
     // Create table
@@ -123,7 +150,7 @@ function createPersonSchedule(personName) {
         partCell.setAttribute('data-label', 'الجزء');
 
         // Apply status color based on date and completion
-        const statusClass = getDayCssClass(personName, dayData, currentWeek, day);
+        const statusClass = getDayCssClass(personName, dayData, weekNumber, day);
         if (statusClass) {
             partCell.classList.add(statusClass);
         }
@@ -140,7 +167,7 @@ function createPersonSchedule(personName) {
 
         // Day 7 (compensation day) should not have completion button
         if (day !== 7) {
-            const isCompleted = isDayCompleted(personName, currentWeek, day);
+            const isCompleted = isDayCompleted(personName, weekNumber, day);
 
             // Container row for badge + button on the same line
             const statusRow = document.createElement('div');
@@ -160,7 +187,7 @@ function createPersonSchedule(personName) {
             completeBtn.className = isCompleted ? 'complete-btn complete-btn-done' : 'complete-btn';
             // \"تم\" لحفظ اليوم، و\"إلغاء\" لإرجاعه بدون لون أخضر في الزر نفسه
             completeBtn.textContent = isCompleted ? 'إلغاء' : 'تم';
-            completeBtn.dataset.week = String(currentWeek);
+            completeBtn.dataset.week = String(weekNumber);
             completeBtn.dataset.day = String(day);
             completeBtn.dataset.person = personName;
             statusRow.appendChild(completeBtn);
@@ -177,7 +204,7 @@ function createPersonSchedule(personName) {
     container.appendChild(table);
 
     // Update progress bar for this person/week
-    updatePersonProgress(personName, currentWeek);
+    updatePersonProgress(personName, weekNumber);
 }
 
 // Update current week info
@@ -185,13 +212,86 @@ function updateCurrentWeekInfoPerson() {
     const config = getConfig();
     if (!config) return;
     
-    const currentWeek = getCurrentWeekNumber();
-    const weekDates = getWeekDates(currentWeek);
+    const displayedWeek = getDisplayedWeekPerson();
+    const weekDates = getWeekDates(displayedWeek);
     const startDate = formatDate(weekDates[0]);
     const endDate = formatDate(weekDates[6]);
     
     const infoElement = document.getElementById('current-week-info');
-    infoElement.textContent = `الأسبوع الحالي: الأسبوع ${currentWeek} (${startDate} - ${endDate})`;
+    const currentWeek = getCurrentWeekNumber();
+    if (displayedWeek === currentWeek) {
+        infoElement.textContent = `الأسبوع الحالي: الأسبوع ${displayedWeek} (${startDate} - ${endDate})`;
+    } else {
+        infoElement.textContent = `الأسبوع ${displayedWeek} (${startDate} - ${endDate})`;
+    }
+}
+
+// Render week navigation buttons for person page
+function renderWeekNavigationPerson() {
+    const container = document.getElementById('week-navigation-container-person');
+    if (!container) return;
+    
+    const currentWeek = getCurrentWeekNumber();
+    const displayedWeek = getDisplayedWeekPerson();
+    
+    container.innerHTML = '';
+    
+    // Always create both buttons, but hide them if not needed
+    // This ensures space-between works correctly
+    
+    // Previous week button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'week-nav-btn week-nav-prev';
+    if (displayedWeek > 1) {
+        prevBtn.textContent = 'الأسبوع السابق ←';
+        prevBtn.onclick = () => navigateToWeekPerson(displayedWeek - 1);
+    } else {
+        prevBtn.className += ' hidden';
+        prevBtn.textContent = ''; // Empty text for hidden button
+    }
+    container.appendChild(prevBtn);
+    
+    // Next week button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'week-nav-btn week-nav-next';
+    if (displayedWeek < currentWeek) {
+        nextBtn.textContent = '→ الأسبوع اللاحق';
+        nextBtn.onclick = () => navigateToWeekPerson(displayedWeek + 1);
+    } else {
+        nextBtn.className += ' hidden';
+        nextBtn.textContent = ''; // Empty text for hidden button
+    }
+    container.appendChild(nextBtn);
+}
+
+// Navigate to a specific week on person page
+function navigateToWeekPerson(weekNumber) {
+    const currentWeek = getCurrentWeekNumber();
+    
+    // Validate: can't go before week 1
+    if (weekNumber < 1) {
+        weekNumber = 1;
+    }
+    
+    // Validate: can't go to future weeks (only current week and past)
+    if (weekNumber > currentWeek) {
+        weekNumber = currentWeek;
+    }
+    
+    // Save displayed week
+    saveDisplayedWeekPerson(weekNumber);
+    
+    // Re-render schedule
+    createPersonSchedule(selectedPerson, weekNumber);
+    
+    // Update navigation buttons
+    renderWeekNavigationPerson();
+    
+    // Update week info
+    updateCurrentWeekInfoPerson();
+    
+    // Update progress
+    updatePersonProgress(selectedPerson, weekNumber);
 }
 
 // Initialize person page
@@ -222,6 +322,9 @@ async function initPersonPage() {
     
     // Set initial active button
     updatePersonButtons(selectedPerson);
+    
+    // Render navigation buttons
+    renderWeekNavigationPerson();
     
     // Create schedule for selected person
     createPersonSchedule(selectedPerson);
@@ -277,12 +380,13 @@ async function initPersonPage() {
         }
 
         // Rebuild schedule for updated styles
-        createPersonSchedule(selectedPerson);
+        const displayedWeek = getDisplayedWeekPerson();
+        createPersonSchedule(selectedPerson, displayedWeek);
     });
 }
 
-// Update visual progress bar for current week/person
-function updatePersonProgress(personName, currentWeek) {
+// Update visual progress bar for a specific week/person
+function updatePersonProgress(personName, weekNumber) {
     const progressContainer = document.getElementById('person-progress');
     if (!progressContainer) return;
 
@@ -293,7 +397,7 @@ function updatePersonProgress(personName, currentWeek) {
     let completedDays = 0;
 
     for (let day = 1; day <= totalDays; day++) {
-        if (isDayCompleted(personName, currentWeek, day)) {
+        if (isDayCompleted(personName, weekNumber, day)) {
             completedDays++;
         }
     }
@@ -304,7 +408,12 @@ function updatePersonProgress(personName, currentWeek) {
 
     const text = document.createElement('div');
     text.className = 'person-progress-text';
-    text.textContent = `تقدم هذا الأسبوع: ${completedDays} من ${totalDays} (${percent}٪)`;
+    const currentWeek = getCurrentWeekNumber();
+    if (weekNumber === currentWeek) {
+        text.textContent = `تقدم هذا الأسبوع: ${completedDays} من ${totalDays} (${percent}٪)`;
+    } else {
+        text.textContent = `تقدم الأسبوع ${weekNumber}: ${completedDays} من ${totalDays} (${percent}٪)`;
+    }
 
     const bar = document.createElement('div');
     bar.className = 'progress-bar';

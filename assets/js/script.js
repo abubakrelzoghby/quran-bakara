@@ -1,6 +1,7 @@
 // Global data storage - loaded from API
 let DATA = null;
 let CURRENT_WEEK = 1;
+let DISPLAYED_WEEK = null; // Currently displayed week (can be different from current week)
 
 // LocalStorage keys and reading status structure
 const READING_STATUS_KEY = 'baqaraReadingStatus';
@@ -329,16 +330,35 @@ function getCurrentWeekNumber() {
     return weekNumber;
 }
 
-// Generate schedule data for current week only
-function generateSchedule() {
+// Get displayed week (always default to current week on page load/refresh)
+function getDisplayedWeek() {
+    if (DISPLAYED_WEEK !== null) {
+        return DISPLAYED_WEEK;
+    }
+    
+    // Always default to current week on page load/refresh
+    // Don't use localStorage - always show current week when page loads
+    const currentWeek = getCurrentWeekNumber();
+    DISPLAYED_WEEK = currentWeek;
+    return currentWeek;
+}
+
+// Save displayed week (in memory only, not localStorage)
+// This way, refresh always shows current week
+function saveDisplayedWeek(weekNumber) {
+    DISPLAYED_WEEK = weekNumber;
+    // Don't save to localStorage - we want to always show current week on refresh
+}
+
+// Generate schedule data for a specific week
+function generateSchedule(weekNumber = null) {
     const config = getConfig();
     if (!config || !DATA) return [];
     
     const schedule = [];
-    const currentWeek = getCurrentWeekNumber();
     
-    // Only generate current week
-    const week = currentWeek;
+    // Use provided week number, or displayed week, or current week
+    const week = weekNumber || getDisplayedWeek();
     const weekData = {
         weekNumber: week,
         dates: getWeekDates(week),
@@ -535,24 +555,117 @@ function createWeekTable(weekData) {
 // Update current week info
 function updateCurrentWeekInfo() {
     const config = getConfig();
-    const currentWeek = getCurrentWeekNumber();
-    const weekDates = getWeekDates(currentWeek);
+    const displayedWeek = getDisplayedWeek();
+    const weekDates = getWeekDates(displayedWeek);
     const startDate = formatDate(weekDates[0]);
     const endDate = formatDate(weekDates[6]);
     
     const infoElement = document.getElementById('current-week-info');
-    infoElement.textContent = `الأسبوع الحالي: الأسبوع ${currentWeek} (${startDate} - ${endDate})`;
+    const currentWeek = getCurrentWeekNumber();
+    if (displayedWeek === currentWeek) {
+        infoElement.textContent = `الأسبوع الحالي: الأسبوع ${displayedWeek} (${startDate} - ${endDate})`;
+    } else {
+        infoElement.textContent = `الأسبوع ${displayedWeek} (${startDate} - ${endDate})`;
+    }
 }
 
-// Update overall progress bar for current week (all people together)
-function updateOverallWeekProgress() {
+// Render week navigation buttons
+function renderWeekNavigation() {
+    const container = document.getElementById('week-navigation-container');
+    if (!container) return;
+    
+    const currentWeek = getCurrentWeekNumber();
+    const displayedWeek = getDisplayedWeek();
+    
+    container.innerHTML = '';
+    
+    // Always create both buttons, but hide them if not needed
+    // This ensures space-between works correctly
+    
+    // Previous week button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'week-nav-btn week-nav-prev';
+    if (displayedWeek > 1) {
+        prevBtn.textContent = 'الأسبوع السابق ←';
+        prevBtn.onclick = () => navigateToWeek(displayedWeek - 1);
+    } else {
+        prevBtn.className += ' hidden';
+        prevBtn.textContent = ''; // Empty text for hidden button
+    }
+    container.appendChild(prevBtn);
+    
+    // Next week button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'week-nav-btn week-nav-next';
+    if (displayedWeek < currentWeek) {
+        nextBtn.textContent = '→ الأسبوع اللاحق';
+        nextBtn.onclick = () => navigateToWeek(displayedWeek + 1);
+    } else {
+        nextBtn.className += ' hidden';
+        nextBtn.textContent = ''; // Empty text for hidden button
+    }
+    container.appendChild(nextBtn);
+}
+
+// Navigate to a specific week
+function navigateToWeek(weekNumber) {
+    const currentWeek = getCurrentWeekNumber();
+    
+    // Validate: can't go before week 1
+    if (weekNumber < 1) {
+        weekNumber = 1;
+    }
+    
+    // Validate: can't go to future weeks (only current week and past)
+    if (weekNumber > currentWeek) {
+        weekNumber = currentWeek;
+    }
+    
+    // Save displayed week
+    saveDisplayedWeek(weekNumber);
+    
+    // Re-render schedule
+    renderSchedule();
+    
+    // Update navigation buttons
+    renderWeekNavigation();
+    
+    // Update week info
+    updateCurrentWeekInfo();
+    
+    // Update progress
+    updateOverallWeekProgress(weekNumber);
+}
+
+// Render schedule for displayed week
+function renderSchedule() {
+    const container = document.getElementById('schedule-container');
+    if (!container) return;
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    const displayedWeek = getDisplayedWeek();
+    const schedule = generateSchedule(displayedWeek);
+    
+    schedule.forEach(weekData => {
+        const weekTable = createWeekTable(weekData);
+        if (weekTable) {
+            container.appendChild(weekTable);
+        }
+    });
+}
+
+// Update overall progress bar for a specific week (all people together)
+function updateOverallWeekProgress(weekNumberOverride = null) {
     const container = document.getElementById('overall-week-progress');
     if (!container) return;
 
     const config = getConfig();
     if (!config) return;
 
-    const currentWeek = getCurrentWeekNumber();
+    // Use provided week number or displayed week
+    const weekNumber = weekNumberOverride || getDisplayedWeek();
     const totalDaysPerPerson = config.readingDays || 6; // exclude compensation day
 
     container.innerHTML = '';
@@ -560,7 +673,12 @@ function updateOverallWeekProgress() {
     // Text for segmented per-person progress
     const textPerPerson = document.createElement('div');
     textPerPerson.className = 'week-progress-text';
-    textPerPerson.textContent = 'تقدم الأسبوع الحالي لكل واحد منهم:';
+    const currentWeek = getCurrentWeekNumber();
+    if (weekNumber === currentWeek) {
+        textPerPerson.textContent = 'تقدم الأسبوع الحالي لكل واحد منهم:';
+    } else {
+        textPerPerson.textContent = `تقدم الأسبوع ${weekNumber} لكل واحد منهم:`;
+    }
 
     const bar = document.createElement('div');
     bar.className = 'week-progress-bar';
@@ -571,7 +689,7 @@ function updateOverallWeekProgress() {
     config.people.forEach(personName => {
         let completedDays = 0;
         for (let day = 1; day <= totalDaysPerPerson; day++) {
-            if (isDayCompleted(personName, currentWeek, day)) {
+            if (isDayCompleted(personName, weekNumber, day)) {
                 completedDays++;
             }
         }
@@ -624,16 +742,16 @@ async function init() {
     // Try to load remote progress (if PHP backend is available)
     await loadRemoteProgress();
     
-    const schedule = generateSchedule();
+    // Render schedule for displayed week
+    renderSchedule();
     
-    schedule.forEach(weekData => {
-        const weekTable = createWeekTable(weekData);
-        if (weekTable) {
-            container.appendChild(weekTable);
-        }
-    });
+    // Render navigation buttons
+    renderWeekNavigation();
     
+    // Update week info
     updateCurrentWeekInfo();
+    
+    // Update progress
     updateOverallWeekProgress();
     
     // Setup modal close handlers
