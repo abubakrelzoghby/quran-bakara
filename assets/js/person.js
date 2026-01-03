@@ -37,6 +37,14 @@ function updatePersonButtons(selectedPersonName) {
     });
 }
 
+// Update header title with selected person name
+function updatePersonHeaderTitle(personName) {
+    const headerTitle = document.getElementById('person-header-title');
+    if (headerTitle && personName) {
+        headerTitle.textContent = `جدولي الشخصي - ${personName}`;
+    }
+}
+
 // Get displayed week for person page (always default to current week on page load/refresh)
 function getDisplayedWeekPerson() {
     if (DISPLAYED_WEEK_PERSON !== null) {
@@ -316,12 +324,14 @@ async function initPersonPage() {
             selectedPerson = btn.dataset.person;
             savePerson(selectedPerson);
             updatePersonButtons(selectedPerson);
+            updatePersonHeaderTitle(selectedPerson);
             createPersonSchedule(selectedPerson);
         };
     });
     
     // Set initial active button
     updatePersonButtons(selectedPerson);
+    updatePersonHeaderTitle(selectedPerson);
     
     // Render navigation buttons
     renderWeekNavigationPerson();
