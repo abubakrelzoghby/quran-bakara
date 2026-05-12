@@ -1,6 +1,6 @@
 # New system roadmap
 
-**Status:** Planning artifact only. No implementation has started from this file.
+**Status:** Implementation has started. See the tracking table for per-slice status.
 
 **Sources:** [`PRODUCT_BRIEF.md`](./PRODUCT_BRIEF.md), [`DEEP_ANALYSIS_AND_PLAN.md`](./DEEP_ANALYSIS_AND_PLAN.md), [`CANONICAL_18_PARTS.md`](./CANONICAL_18_PARTS.md), and the current app overview docs.
 
@@ -12,7 +12,7 @@ Phase notes are saved in [`phases/`](./phases/). After each `/start-phase` run, 
 
 | ID | Feature / slice | Status | Phase note | Remaining work |
 |----|-----------------|--------|------------|----------------|
-| P1-F1 | Calendar projection spec/module for Friday through Thursday weeks | Not started | - | Define date projection and week index behavior. |
+| P1-F1 | Calendar projection spec/module for Friday through Thursday weeks | Done | [`p1-f1-calendar-projection.md`](./phases/p1-f1-calendar-projection.md) | None; next follow-up is P1-F2 canonical reading template. |
 | P1-F2 | Static canonical `P01` through `P18` reading template | Not started | - | Map current `api/data.json` parts to stable part IDs. |
 | P1-F3 | Tiny PHP assignment preview for solo once/week | Not started | - | Print deterministic assignments for multiple weeks. |
 | P1-F4 | Pilot storage decision: SQLite vs MySQL/MariaDB | Not started | - | Confirm shared-hosting support. |
