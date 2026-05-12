@@ -47,11 +47,13 @@ This separation reduces accidental production releases and makes it obvious wher
 
 Even as a solo maintainer, follow the same branch path:
 
-1. Work on `dev`.
-2. Test locally.
-3. Merge `dev` into `staging`.
-4. Test on the staging server.
-5. Merge `staging` into `main` only after validation passes.
+1. Start from clean `dev`.
+2. Create a short-lived `feature/*` branch for each `/start-phase` or feature slice.
+3. Test locally on the feature branch.
+4. Use `/push-dev` to commit the feature branch, merge it into `dev`, delete the local feature branch, and push `dev`.
+5. Promote `dev` to `staging`.
+6. Test on the staging server.
+7. Merge `staging` into `main` only after validation passes.
 
 This adds one extra step, but keeps production cleaner and gives a stable place to test the exact candidate release.
 
@@ -93,6 +95,7 @@ Avoid skipping levels unless there is a deliberate emergency hotfix process.
 This repository should now be treated as:
 
 - `dev` = local development branch
+- `feature/*` = short-lived implementation branch for one feature or phase slice
 - `staging` = testing branch
 - `main` = production branch
 
