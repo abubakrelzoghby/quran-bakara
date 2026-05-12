@@ -12,3 +12,11 @@ Constraints:
 - Use senior-analyst -> senior-planner -> senior-implementer -> senior-tester.
 - If tests fail inside the slice, fix once and re-test.
 - Stop only for unclear requirements, unsafe operations, new runtime requirements, or scope expansion.
+
+Documentation:
+- Read `.cursor/docs/new-system-requests/ROADMAP.md` if it exists.
+- Save the phase handoff to `.cursor/docs/new-system-requests/phases/<phase-or-feature-slug>.md`.
+- Update `.cursor/docs/new-system-requests/ROADMAP.md` after testing:
+  - mark the slice status as Done, In progress, Blocked, or Not started,
+  - add links to the phase note,
+  - record remaining follow-up work.

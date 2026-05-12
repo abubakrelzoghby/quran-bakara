@@ -25,6 +25,7 @@ Return a concise roadmap with:
 5. Shared-hosting risks.
 6. Suggested first safe implementation slice.
 7. What should not be built yet.
+8. A status table that can be updated by `/start-phase`.
 
 ## Rules
 
@@ -34,6 +35,7 @@ Return a concise roadmap with:
 - Prefer small vertical slices over broad rewrites.
 - Clearly label assumptions vs confirmed requirements.
 - If requirements conflict, surface the conflict instead of resolving silently.
+- Include stable feature IDs like `P1-F1` so implementation status can be tracked over time.
 
 ## Owner Prompt
 

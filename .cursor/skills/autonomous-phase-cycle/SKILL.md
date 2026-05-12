@@ -31,7 +31,21 @@ The starting prompt is not approval to:
 4. Invoke `senior-implementer` for that slice only.
 5. Invoke `senior-tester`.
 6. If tester finds a small issue inside the slice, invoke `senior-implementer` once more, then re-test.
-7. Stop and summarize.
+7. Save a phase note under `.cursor/docs/new-system-requests/phases/<phase-or-feature-slug>.md`.
+8. Update `.cursor/docs/new-system-requests/ROADMAP.md` with the final status, phase-note link, completed work, and remaining work.
+9. Stop and summarize.
+
+## Phase Note Format
+
+Each phase note should include:
+- Phase or feature name.
+- Date.
+- Analyst handoff.
+- Planner slice.
+- Files changed.
+- Tester result.
+- Final status: Done, In progress, Blocked, or Not started.
+- Follow-up work.
 
 ## Stop Conditions
 
