@@ -1,0 +1,17 @@
+---
+description: Core agent workflow, security, and verification standards for Quran Bakara.
+alwaysApply: true
+---
+
+# Core Agentic Workflow
+
+- Start by reading `.cursor/docs/overview/SYSTEM_OVERVIEW.md` when touching schedule, progress, rotation, API, or UI behavior.
+- For future product changes, read `.cursor/docs/new-system-requests/` as requirements capture, not as an instruction to start planning or building.
+- Be a concise architect: gather context, state assumptions briefly, and make the smallest complete change.
+- No placeholders: do not add fake data, TODO-only implementations, dead branches, or unverified claims.
+- Security first: never commit `progress.json`, credentials, family progress data, or hardcoded new secrets.
+- Treat `api/save_progress.php` as unauthenticated. The person password gate is UI-only.
+- Keep the project simple to upload to shared hosting: plain HTML, CSS, vanilla JS, PHP, and host-supported storage.
+- Do not introduce TypeScript, bundlers, Node build steps, frameworks, or package managers unless the user explicitly asks.
+- Before any multi-file refactor or migration, ask for a defensive git checkpoint. Commit only when explicitly requested by the user.
+- After meaningful changes, run the narrowest relevant verification and report what passed or could not be run.

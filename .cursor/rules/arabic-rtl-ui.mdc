@@ -1,0 +1,14 @@
+---
+description: Arabic RTL UI, responsive layout, and typography guidance for frontend files.
+globs: index.html,person.html,assets/css/*.css,assets/js/*.js
+alwaysApply: false
+---
+
+# Arabic RTL UI
+
+- Preserve Arabic RTL behavior in both pages. Check `dir="rtl"` assumptions before changing layout or DOM order.
+- Keep shared visual behavior centralized in `assets/css/styles.css`; avoid inline styling unless already local to a tiny dynamic fragment.
+- Prefer `textContent` for dynamic Arabic copy. Use `innerHTML` only for trusted local markup that needs line breaks or structure.
+- Test responsive table/card behavior on `index.html` and `person.html` after layout changes.
+- Use readable Arabic typography and generous line height for verse snippets, ranges, and completion labels.
+- Keep person colors and day status colors consistent across full schedule and personal view.

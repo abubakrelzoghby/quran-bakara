@@ -1,0 +1,14 @@
+---
+description: PHP API and progress persistence rules for schedule and completion endpoints.
+globs: api/*.php,assets/js/*.js
+alwaysApply: false
+---
+
+# PHP Progress API
+
+- `api/get_data.php` must return `config`, `sections`, `rotationPattern`, `currentWeek`, and `currentWeekRotation`.
+- Keep week-number calculations consistent between PHP and the JavaScript fallback in `assets/js/script.js`.
+- `api/get_progress.php` returns a flat object keyed like `person__weekN-dayD`; omitted keys mean incomplete.
+- `api/save_progress.php` writes root `progress.json`. It is unauthenticated, so validate inputs and avoid widening the write surface.
+- Do not commit real `progress.json`; it is runtime state and should stay gitignored.
+- For local checks, run `php -S localhost:8080` from the repository root and test both API and UI flows.

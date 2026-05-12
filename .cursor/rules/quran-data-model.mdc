@@ -1,0 +1,14 @@
+---
+description: Quran schedule data invariants for Surah Al-Baqarah metadata and rotation changes.
+globs: api/data.json,.cursor/docs/new-system-requests/*.md,.cursor/docs/overview/*.md
+alwaysApply: false
+---
+
+# Quran Data Model
+
+- `api/data.json` is the canonical schedule source for people, sections, parts, and rotation.
+- Preserve the model unless explicitly asked to change it: 3 people, 3 sections, 7 days per week, 6 reading days, day 7 catch-up.
+- Keep every `sections[].parts[]` aligned with `config.daysPerWeek`; reading days need numeric `verseStart`, `verseEnd`, and `page`.
+- Keep `rotationPattern` rows the same length as `config.people`; values are 0-based indexes into `sections`.
+- Changing person names affects `api/data.json`, HTML buttons, `assets/js/person.js`, CSS class maps, and persisted progress keys.
+- Validate Quran ranges against `.cursor/docs/overview/SCHEDULE_REFERENCE.md` and `.cursor/docs/new-system-requests/CANONICAL_18_PARTS.md` before editing verse boundaries.

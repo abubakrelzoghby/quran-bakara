@@ -1,0 +1,13 @@
+---
+description: Keep development compatible with simple shared PHP hosting and minimal upload deployment.
+alwaysApply: true
+---
+
+# Shared Hosting Development
+
+- Default deployment target is shared hosting: upload files, run PHP, no build server required.
+- Prefer plain `.html`, `.css`, `.js`, `.php`, `.json`, and simple host-supported persistence.
+- Do not add TypeScript, React, Vite, npm scripts, Composer dependencies, or generated build output without explicit approval.
+- For small features, edit only the files needed and verify the affected page/API path.
+- For big phase changes, first clarify the phase boundary, then use a checkpoint before multi-file edits.
+- Keep deployment notes in `.cursor/docs/overview/OPERATIONS.md` aligned with any runtime requirement change.

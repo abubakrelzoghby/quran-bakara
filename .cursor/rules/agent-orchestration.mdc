@@ -1,0 +1,16 @@
+---
+description: Orchestrate senior subagents with explicit handoffs for analysis, planning, implementation, and testing.
+alwaysApply: true
+---
+
+# Agent Orchestration
+
+- The parent agent coordinates the workflow; subagents do not need to talk directly.
+- Use structured handoffs between agents: analysis -> plan -> implementation -> test.
+- Use `requirements-to-roadmap` or `/shape-roadmap` before starting a big new-system phase when the owner wants phases/features first.
+- Small features may skip `senior-analyst` and `senior-planner` if the request is clear.
+- Phase changes should use `senior-analyst`, then `senior-planner`, then owner approval, then `senior-implementer`, then `senior-tester`.
+- If the owner invokes `autonomous-phase-cycle` or `/start-phase`, the initial prompt is approval to run analysis -> planning -> first safe implementation slice -> testing without asking between steps.
+- Bugs should use evidence first: `senior-analyst` for unclear bugs, `senior-implementer` for the fix, `senior-tester` for verification.
+- Keep every handoff short: goal, files, decisions, risks, verification, next agent.
+- Even in autonomous mode, stop for unclear requirements, destructive operations, commits/pushes/deploys, real data migration, new build/runtime requirements, or scope expansion.

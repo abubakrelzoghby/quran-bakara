@@ -1,0 +1,13 @@
+---
+description: Defensive checkpoint rule for multi-file refactors and migrations.
+alwaysApply: true
+---
+
+# Defensive Commits
+
+- Before any multi-file refactor, phase change, API reshaping, storage change, or broad UI rewrite, pause and propose a git checkpoint.
+- Run `git status --short` first and identify unrelated changes.
+- Create commits only after explicit user approval.
+- If approved, keep the checkpoint commit separate from the refactor commit.
+- Never include `progress.json`, secrets, credentials, or unrelated user work in a checkpoint.
+- In `autonomous-phase-cycle`, do not create commits. Treat the owner's start prompt as approval to continue without a commit checkpoint, unless the change requires destructive operations or real data migration.
